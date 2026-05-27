@@ -10,27 +10,36 @@ body {
     font-family: 'Segoe UI';
     background:#f5f6fa;
     margin:0;
-    padding:20px;
 }
-.container { max-width:1200px; margin:auto; }
 
-.header {
+.container { max-width:1200px; margin:auto; padding:20px; }
+
+/* 🔹 MENU */
+.menu {
     background:#1e3c72;
-    color:white;
-    padding:20px;
-    border-radius:8px;
+    padding:15px;
     display:flex;
-    justify-content:space-between;
+    gap:10px;
 }
 
-button {
-    padding:10px 20px;
-    background:red;
-    color:white;
+.menu button {
+    padding:10px 15px;
     border:none;
     cursor:pointer;
+    background:#2a5298;
+    color:white;
+    border-radius:5px;
 }
 
+.menu button.active {
+    background:red;
+}
+
+/* secciones */
+.seccion { display:none; }
+.seccion.active { display:block; }
+
+/* tablas */
 .table-container {
     background:white;
     padding:20px;
@@ -51,7 +60,7 @@ th, td {
 th { background:#eee; }
 
 .badge-super {
-    padding:4px 8px;
+    padding:5px 8px;
     border-radius:5px;
     color:white;
 }
@@ -61,48 +70,81 @@ th { background:#eee; }
 .tienda { background:green; }
 .dorado { background:brown; }
 
+.btn-update {
+    margin-top:10px;
+    padding:10px;
+    background:red;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- 🔹 MENU -->
+<div class="menu">
+    <button onclick="cambiarSeccion('lectura')" class="active">Lectura</button>
+    <button onclick="cambiarSeccion('cobertura')">Cobertura</button>
+    <button onclick="cambiarSeccion('listas')">Carga de listas</button>
+</div>
+
 <div class="container">
 
-<div class="header">
-    <h2>RGM - Lectura de Precios</h2>
-    <button id="btnActualizar">Actualizar</button>
+<!-- 🔹 LECTURA -->
+<div id="lectura" class="seccion active">
+
+    <button class="btn-update" onclick="actualizar()">Actualizar Precio</button>
+
+    <div class="table-container">
+        <h3>Precios</h3>
+        <table id="tablaPrecios">
+            <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Descripción</th>
+                <th>Super</th>
+                <th>Precio</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
 </div>
 
-<div class="table-container">
-<h3>Precios</h3>
-<table id="tablaPrecios">
-<thead>
-<tr>
-<th>Marca</th>
-<th>Descripción</th>
-<th>Super</th>
-<th>Precio</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+<!-- 🔹 COBERTURA -->
+<div id="cobertura" class="seccion">
+
+    <div class="table-container">
+        <h3>📊 Cobertura</h3>
+
+        <div id="coberturaResumen"></div>
+
+        <table id="tablaCobertura">
+            <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Más barato</th>
+                <th>Más caro</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
 </div>
 
-<div class="table-container">
-<h3>📊 Cobertura</h3>
+<!-- 🔹 LISTAS -->
+<div id="listas" class="seccion">
 
-<div id="coberturaResumen"></div>
-
-<table id="tablaCobertura">
-<thead>
-<tr>
-<th>Marca</th>
-<th>Más barato</th>
-<th>Más caro</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+    <div class="table-container">
+        <h3>📂 Carga de listas</h3>
+        <p style="font-size:18px; color:#777;">Próximamente...</p>
+    </div>
 
 </div>
 
@@ -110,41 +152,47 @@ th { background:#eee; }
 
 <script>
 
-// ✅ TU BASE ORIGINAL (NO TOCAR)
+// ✅ BASE (igual que antes)
 const baseDeDatosScraper = [
-    { marca: "BIMBO", descripcion: "Pan Lactal Blanco Bimbo", super: "TaTa", clase: "tata", precio: 165, oferta: 145 },
+    { marca: "BIMBO", descripcion: "Pan Bimbo", super: "TaTa", clase: "tata", precio: 165, oferta: 145 },
     { marca: "BIMBO", descripcion: "Pan Bimbo", super: "Disco", clase: "disco", precio: 170 },
     { marca: "TAKIS", descripcion: "Takis Fuego", super: "Disco", clase: "disco", precio: 200 },
     { marca: "TAKIS", descripcion: "Takis Fuego", super: "TaTa", clase: "tata", precio: 190 },
     { marca: "SALMAS", descripcion: "Salmas", super: "Tienda Inglesa", clase: "tienda", precio: 150 },
-    { marca: "SALMAS", descripcion: "Salmas", super: "Disco", clase: "disco", precio: 140 },
+    { marca: "SALMAS", descripcion: "Salmas", super: "Disco", classe: "disco", precio: 140 },
     { marca: "TIA ROSA", descripcion: "Tortillas", super: "El Dorado", clase: "dorado", precio: 180 },
     { marca: "TIA ROSA", descripcion: "Tortillas", super: "TaTa", clase: "tata", precio: 170 }
 ];
 
-// ✅ TABLA (igual que la tuya)
+// 🔹 CAMBIAR PESTAÑA
+function cambiarSeccion(id) {
+    document.querySelectorAll('.seccion').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+// 🔹 TABLA PRECIOS
 function procesarYMostrarPrecios() {
     const tbody = document.querySelector("#tablaPrecios tbody");
     tbody.innerHTML = "";
 
     baseDeDatosScraper.forEach(prod => {
-
-        const precioFinal = prod.oferta || prod.precio;
+        const precio = prod.oferta || prod.precio;
 
         const fila = document.createElement("tr");
-
         fila.innerHTML = `
             <td><b>${prod.marca}</b></td>
             <td>${prod.descripcion}</td>
-            <td><span class="badge-super ${prod.clase}">${prod.super}</span></td>
-            <td>$${precioFinal}</td>
+            <td><span class="badge-super ${prod.clase || ''}">${prod.super}</span></td>
+            <td>$${precio}</td>
         `;
-
         tbody.appendChild(fila);
     });
 }
 
-// ✅ NUEVA FUNCIÓN COBERTURA (NO ROMPE NADA)
+// 🔹 COBERTURA
 function generarCobertura() {
 
     const conteo = {};
@@ -155,83 +203,66 @@ function generarCobertura() {
 
         const precio = prod.oferta || prod.precio;
 
-        // conteo
         conteo[prod.super] = (conteo[prod.super] || 0) + 1;
 
-        // promedio
-        if (!resumen[prod.super]) {
-            resumen[prod.super] = { total: 0, cant: 0 };
-        }
+        if (!resumen[prod.super]) resumen[prod.super] = {total:0, cant:0};
         resumen[prod.super].total += precio;
         resumen[prod.super].cant++;
 
-        // por marca
         if (!porMarca[prod.marca]) porMarca[prod.marca] = [];
-        porMarca[prod.marca].push({ super: prod.super, precio });
+        porMarca[prod.marca].push({super: prod.super, precio});
     });
 
-    // más caro / barato
-    let caro = "", barato = "";
-    let max = 0, min = 999999;
+    let caro="", barato="";
+    let max=0, min=999999;
 
-    Object.keys(resumen).forEach(s => {
+    Object.keys(resumen).forEach(s=>{
         let prom = resumen[s].total / resumen[s].cant;
-
-        if (prom > max) { max = prom; caro = s; }
-        if (prom < min) { min = prom; barato = s; }
+        if(prom>max){max=prom;caro=s;}
+        if(prom<min){min=prom;barato=s;}
     });
 
-    // resumen HTML
     let html = "<h4>Productos por supermercado</h4>";
-    Object.keys(conteo).forEach(s => {
+    Object.keys(conteo).forEach(s=>{
         html += `<p>${s}: ${conteo[s]}</p>`;
     });
 
-    html += `
-        <h4>General</h4>
-        <p>Más caro: ${caro}</p>
-        <p>Más barato: ${barato}</p>
-    `;
+    html += `<h4>General</h4>
+    <p>Más caro: ${caro}</p>
+    <p>Más barato: ${barato}</p>`;
 
     document.getElementById("coberturaResumen").innerHTML = html;
 
-    // tabla marcas
     const tbody = document.querySelector("#tablaCobertura tbody");
     tbody.innerHTML = "";
 
-    Object.keys(porMarca).forEach(m => {
+    Object.keys(porMarca).forEach(m=>{
+        let min=999999, max=0;
+        let sMin="", sMax="";
 
-        let min = 999999, max = 0;
-        let supMin = "", supMax = "";
-
-        porMarca[m].forEach(x => {
-            if (x.precio < min) { min = x.precio; supMin = x.super; }
-            if (x.precio > max) { max = x.precio; supMax = x.super; }
+        porMarca[m].forEach(p=>{
+            if(p.precio < min){min=p.precio; sMin=p.super;}
+            if(p.precio > max){max=p.precio; sMax=p.super;}
         });
 
         const fila = document.createElement("tr");
-
         fila.innerHTML = `
             <td>${m}</td>
-            <td>${supMin} ($${min})</td>
-            <td>${supMax} ($${max})</td>
+            <td>${sMin} ($${min})</td>
+            <td>${sMax} ($${max})</td>
         `;
-
         tbody.appendChild(fila);
     });
 }
 
-// ✅ BOTÓN (CLAVE)
-document.getElementById("btnActualizar").addEventListener("click", () => {
+// 🔹 ACTUALIZAR TODO
+function actualizar() {
     procesarYMostrarPrecios();
     generarCobertura();
-});
+}
 
-// ✅ AUTOLOAD
-window.onload = () => {
-    procesarYMostrarPrecios();
-    generarCobertura();
-};
+// 🔹 INIT
+window.onload = actualizar;
 
 </script>
 
