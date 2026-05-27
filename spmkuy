@@ -139,7 +139,6 @@
 </div>
 
 <script>
-    // Base de datos exacta solicitada con las 7 marcas distribuidas en las 4 cadenas de Uruguay
     const baseDeDatosScraper = [
         { marca: "BIMBO", descripcion: "Pan Lactal Blanco Bimbo 550g", super: "TaTa", clase: "tata", precio: 165, oferta: 145 },
         { marca: "BIMBO", descripcion: "Pan Artesano Bimbo 500g", super: "Tienda Inglesa", clase: "tienda", precio: 189, oferta: null },
@@ -158,14 +157,11 @@
 
     function procesarYMostrarPrecios() {
         const tbody = document.querySelector("#tablaPrecios tbody");
-        tbody.innerHTML = ""; // Limpiamos la tabla vieja
-
+        tbody.innerHTML = "";
         let contadorOfertas = 0;
 
         baseDeDatosScraper.forEach(prod => {
             const fila = document.createElement("tr");
-
-            // Validar si tiene oferta o se mantiene el precio regular
             let celdaPrecioPublicado = "";
             if (prod.oferta) {
                 contadorOfertas++;
@@ -173,7 +169,6 @@
             } else {
                 celdaPrecioPublicado = `<span>$${prod.precio}</span>`;
             }
-
             fila.innerHTML = `
                 <td style="font-weight: bold; color: #1e3c72;">${prod.marca}</td>
                 <td>${prod.descripcion}</td>
@@ -184,18 +179,15 @@
             tbody.appendChild(fila);
         });
 
-        // Actualizar tarjetas de contadores estadísticos arriba
         document.getElementById("stat-productos").innerText = baseDeDatosScraper.length;
         document.getElementById("stat-ofertas").innerText = contadorOfertas;
     }
 
-    // Asignar el evento al botón
     document.getElementById("btnActualizar").addEventListener("click", () => {
         procesarYMostrarPrecios();
         alert("Escaneo completado: Se leyeron las páginas de TaTa, Tienda Inglesa, Disco y El Dorado.");
     });
 
-    // Ejecución automática al cargar por primera vez
     window.onload = () => {
         setTimeout(procesarYMostrarPrecios, 800);
     };
