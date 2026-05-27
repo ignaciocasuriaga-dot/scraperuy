@@ -6,51 +6,57 @@
 <title>RGM - Lectura de Precios</title>
 
 <style>
-body {
-    font-family: 'Segoe UI';
-    background:#f5f6fa;
-    margin:0;
+body { font-family:'Segoe UI'; margin:0; background:#f5f6fa; }
+
+.header {
+    background:#2c4a7a;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.container { max-width:1200px; margin:auto; padding:20px; }
+.header h1 { margin:0; }
 
-/* 🔹 MENU */
+.btn-header {
+    background:red;
+    color:white;
+    padding:12px 20px;
+    border:none;
+    cursor:pointer;
+}
+
 .menu {
     background:#1e3c72;
-    padding:15px;
+    padding:10px;
     display:flex;
     gap:10px;
 }
 
 .menu button {
-    padding:10px 15px;
-    border:none;
-    cursor:pointer;
+    padding:10px;
     background:#2a5298;
     color:white;
-    border-radius:5px;
+    border:none;
+    cursor:pointer;
 }
 
-.menu button.active {
-    background:red;
-}
+.menu button.active { background:red; }
 
-/* secciones */
+.container { max-width:1200px; margin:auto; padding:20px; }
+
 .seccion { display:none; }
 .seccion.active { display:block; }
 
-/* tablas */
 .table-container {
     background:white;
     padding:20px;
-    margin-top:20px;
     border-radius:8px;
+    margin-top:20px;
 }
 
-table {
-    width:100%;
-    border-collapse:collapse;
-}
+table { width:100%; border-collapse:collapse; }
 
 th, td {
     padding:10px;
@@ -65,41 +71,28 @@ th { background:#eee; }
     color:white;
 }
 
-.tata { background:orange; }
-.disco { background:blue; }
-.tienda { background:green; }
-.dorado { background:brown; }
-
-.btn-update {
-    margin-top:10px;
-    padding:10px;
-    background:red;
-    color:white;
-    border:none;
-    cursor:pointer;
-}
-
+.tata {background:orange;}
+.disco {background:blue;}
 </style>
 </head>
 
 <body>
 
-<!-- 🔹 MENU -->
+<div class="header">
+    <h1>RGM - Lectura de Precios</h1>
+    <button class="btn-header" onclick="actualizar()">Actualizar</button>
+</div>
+
 <div class="menu">
-    <button onclick="cambiarSeccion('lectura')" class="active">Lectura</button>
-    <button onclick="cambiarSeccion('cobertura')">Cobertura</button>
-    <button onclick="cambiarSeccion('listas')">Carga de listas</button>
+    <button class="active" onclick="cambiarSeccion('lectura', this)">Lectura</button>
+    <button onclick="cambiarSeccion('cobertura', this)">Cobertura</button>
+    <button onclick="cambiarSeccion('listas', this)">Carga de listas</button>
 </div>
 
 <div class="container">
 
-<!-- 🔹 LECTURA -->
 <div id="lectura" class="seccion active">
-
-    <button class="btn-update" onclick="actualizar()">Actualizar Precio</button>
-
     <div class="table-container">
-        <h3>Precios</h3>
         <table id="tablaPrecios">
             <thead>
             <tr>
@@ -112,17 +105,11 @@ th { background:#eee; }
             <tbody></tbody>
         </table>
     </div>
-
 </div>
 
-<!-- 🔹 COBERTURA -->
 <div id="cobertura" class="seccion">
-
     <div class="table-container">
-        <h3>📊 Cobertura</h3>
-
         <div id="coberturaResumen"></div>
-
         <table id="tablaCobertura">
             <thead>
             <tr>
@@ -131,140 +118,3 @@ th { background:#eee; }
                 <th>Más caro</th>
             </tr>
             </thead>
-            <tbody></tbody>
-        </table>
-
-    </div>
-
-</div>
-
-<!-- 🔹 LISTAS -->
-<div id="listas" class="seccion">
-
-    <div class="table-container">
-        <h3>📂 Carga de listas</h3>
-        <p style="font-size:18px; color:#777;">Próximamente...</p>
-    </div>
-
-</div>
-
-</div>
-
-<script>
-
-// ✅ BASE (igual que antes)
-const baseDeDatosScraper = [
-    { marca: "BIMBO", descripcion: "Pan Bimbo", super: "TaTa", clase: "tata", precio: 165, oferta: 145 },
-    { marca: "BIMBO", descripcion: "Pan Bimbo", super: "Disco", clase: "disco", precio: 170 },
-    { marca: "TAKIS", descripcion: "Takis Fuego", super: "Disco", clase: "disco", precio: 200 },
-    { marca: "TAKIS", descripcion: "Takis Fuego", super: "TaTa", clase: "tata", precio: 190 },
-    { marca: "SALMAS", descripcion: "Salmas", super: "Tienda Inglesa", clase: "tienda", precio: 150 },
-    { marca: "SALMAS", descripcion: "Salmas", super: "Disco", classe: "disco", precio: 140 },
-    { marca: "TIA ROSA", descripcion: "Tortillas", super: "El Dorado", clase: "dorado", precio: 180 },
-    { marca: "TIA ROSA", descripcion: "Tortillas", super: "TaTa", clase: "tata", precio: 170 }
-];
-
-// 🔹 CAMBIAR PESTAÑA
-function cambiarSeccion(id) {
-    document.querySelectorAll('.seccion').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-
-    document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-}
-
-// 🔹 TABLA PRECIOS
-function procesarYMostrarPrecios() {
-    const tbody = document.querySelector("#tablaPrecios tbody");
-    tbody.innerHTML = "";
-
-    baseDeDatosScraper.forEach(prod => {
-        const precio = prod.oferta || prod.precio;
-
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-            <td><b>${prod.marca}</b></td>
-            <td>${prod.descripcion}</td>
-            <td><span class="badge-super ${prod.clase || ''}">${prod.super}</span></td>
-            <td>$${precio}</td>
-        `;
-        tbody.appendChild(fila);
-    });
-}
-
-// 🔹 COBERTURA
-function generarCobertura() {
-
-    const conteo = {};
-    const resumen = {};
-    const porMarca = {};
-
-    baseDeDatosScraper.forEach(prod => {
-
-        const precio = prod.oferta || prod.precio;
-
-        conteo[prod.super] = (conteo[prod.super] || 0) + 1;
-
-        if (!resumen[prod.super]) resumen[prod.super] = {total:0, cant:0};
-        resumen[prod.super].total += precio;
-        resumen[prod.super].cant++;
-
-        if (!porMarca[prod.marca]) porMarca[prod.marca] = [];
-        porMarca[prod.marca].push({super: prod.super, precio});
-    });
-
-    let caro="", barato="";
-    let max=0, min=999999;
-
-    Object.keys(resumen).forEach(s=>{
-        let prom = resumen[s].total / resumen[s].cant;
-        if(prom>max){max=prom;caro=s;}
-        if(prom<min){min=prom;barato=s;}
-    });
-
-    let html = "<h4>Productos por supermercado</h4>";
-    Object.keys(conteo).forEach(s=>{
-        html += `<p>${s}: ${conteo[s]}</p>`;
-    });
-
-    html += `<h4>General</h4>
-    <p>Más caro: ${caro}</p>
-    <p>Más barato: ${barato}</p>`;
-
-    document.getElementById("coberturaResumen").innerHTML = html;
-
-    const tbody = document.querySelector("#tablaCobertura tbody");
-    tbody.innerHTML = "";
-
-    Object.keys(porMarca).forEach(m=>{
-        let min=999999, max=0;
-        let sMin="", sMax="";
-
-        porMarca[m].forEach(p=>{
-            if(p.precio < min){min=p.precio; sMin=p.super;}
-            if(p.precio > max){max=p.precio; sMax=p.super;}
-        });
-
-        const fila = document.createElement("tr");
-        fila.innerHTML = `
-            <td>${m}</td>
-            <td>${sMin} ($${min})</td>
-            <td>${sMax} ($${max})</td>
-        `;
-        tbody.appendChild(fila);
-    });
-}
-
-// 🔹 ACTUALIZAR TODO
-function actualizar() {
-    procesarYMostrarPrecios();
-    generarCobertura();
-}
-
-// 🔹 INIT
-window.onload = actualizar;
-
-</script>
-
-</body>
-</html>
